@@ -11,9 +11,6 @@ class Employee(models.Model):
     workArr = models.ForeignKey('workArrangement', on_delete = models.CASCADE, blank = True, null = True)
     role = models.ForeignKey('Role', on_delete = models.CASCADE, blank = True, null = True)
 
-    def pay(self,hours):
-        return self.rate*hours
-
     def __str__(self):
         return self.name
 
