@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 # Create your views here.
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .serializers import *
 from .models import *
@@ -16,38 +16,124 @@ from .models import *
 def employeeList(request):
     tasks = Employee.objects.all()
     serializer = employeeSerializer(tasks, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data,  status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def employeeDetail(request, pk):
     tasks = Employee.objects.get(empId=pk)
     serializer = employeeSerializer(tasks, many=False)
-    return Response(serializer.data)
+    return Response(serializer.data,  status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def employeeCreate(request):
+
+    currTeam = request.data['currTeam']
+    role = request.data['role']
+    name = request.data['name']
+    workArr = request.data['workArr']
+    if(role.lower() =='leader'):
+        try:
+            team = Team.objects.get(name = currTeam)
+            if(team.leader.name == name):
+                pass
+            else:
+                return Response("Team already has a leader",status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response("Team " + currTeam + " does not exist", status=status.HTTP_404_NOT_FOUND)
+    try:
+        if(currTeam==''):pass
+        else:
+            team = Team.objects.get(name = currTeam)
+            request.data["currTeam"] = team.teamId
+    except:
+        if(currTeam != None):
+            return Response("Team: " + currTeam + "does not exist", status=status.HTTP_404_NOT_FOUND)
+    
+    try:
+        if(role==''):pass
+        else:
+            role = Role.objects.get(name = role)
+            request.data['role'] = role.roleID
+    except:
+        if(role != None):
+            return Response("Role: " + role.name + "does not exist",status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        if(workArr == ''): pass
+        else:
+            workArr = workArrangement.objects.get(name = workArr)
+            request.data['workArr'] = workArr.waID
+    except:
+        if(workArr != None):
+            return Response("Work Arrangement: " + workArr.name + "does not exist",status=status.HTTP_404_NOT_FOUND)
+    
+
+  
     serializer = addEmployeeSerializer(data=request.data)
+
 
     if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data,  status=status.HTTP_200_OK)
 
-    return Response(serializer.errors)
+    return Response(serializer.errors,  status=status.HTTP_400_BAD_REQUEST)
    
 
 
 @api_view(['PUT'])
 def employeeUpdate(request, pk):
     employee = Employee.objects.get(empId=pk)
+    
+    currTeam = request.data['currTeam']
+    role = request.data['role']
+    name = request.data['name']
+    workArr = request.data['workArr']
+    if(role.lower() =='Leader'):
+        try:
+            team = Team.objects.get(name = currTeam)
+            if(team.leader.name == name):
+                pass
+            else:
+                return Response("Team already has a leader", status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response("Team" + currTeam + " does not exist", status=status.HTTP_404_NOT_FOUND)
+    try:
+        if(currTeam == ''): pass
+        else:
+            team = Team.objects.get(name = currTeam)
+            request.data['currTeam'] = team.teamId
+    except:
+        if(currTeam != None ):
+
+            return Response("Team: " + currTeam + " does not exist", status=status.HTTP_404_NOT_FOUND)
+    
+    try:
+        if(role==''): pass
+        else:
+            role = Role.objects.get(name = role)
+            request.data['role'] = role.roleID
+    except:
+        if(role != None):
+            return Response("Role: " + role.name + "does not exist", status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        if(workArr == ''): pass
+        else:
+            workArr = workArrangement.objects.get(name = workArr)
+            request.data['workArr'] = workArr.waID
+    except:
+        if(workArr != None):
+            return Response("Work Arrangement: " + workArr.name + "does not exist", status=status.HTTP_404_NOT_FOUND)
     serializer = addEmployeeSerializer(instance=employee, data=request.data)
+
 
     if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data,  status=status.HTTP_200_OK)
 
-    return Response(serializer.errors)
+    return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['DELETE'])
 def employeeDelete(request, pk):
@@ -60,117 +146,142 @@ def employeeDelete(request, pk):
 def teamList(request):
     tasks = Team.objects.all()
     serializer = teamSerializer(tasks, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def teamDetail(request,pk):
     tasks = Team.objects.get(teamId = pk)
     serializer = teamSerializer(tasks, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data,  status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def teamCreate(request):
+    leader = request.data['leader']
+    try:
+        if(leader == ''):
+            pass
+        else:
+            leader = Employee.objects.get(name = leader)
+            request.data['leader'] = leader
+    except:
+        return Response("Employee "+leader+"does not exist", status=status.HTTP_404_NOT_FOUND)
+
     serializer = teamSerializer(data=request.data)
 
     if serializer.is_valid():
         serializer.save()
+        return Response(serializer.data,  status=status.HTTP_200_OK)
 
-    return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['POST'])
-def teamUpdate(request):
-    serializer = teamSerializer(data=request.data)
+@api_view(['PUT'])
+def teamUpdate(request,pk):
+    team = Team.objects.get(teamId=pk)
+    leader = request.data['leader']
+    try:
+        if(leader == ''):
+            pass
+        else:
+            leader = Employee.objects.get(name = leader)
+            team.leader = leader
+    except:
+        return Response("Employee "+leader+"does not exist", status=status.HTTP_400_BAD_REQUEST)
+
+    serializer = teamSerializer(instance=team, data=request.data)
 
     if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data,  status=status.HTTP_200_OK)
 
-    return Response(serializer.errors)
+    return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['DELETE'])
 def teamDelete(request, pk):
-    employee = Team.objects.get(teamId=pk)
-    employee.delete()
+    team = Team.objects.get(teamId=pk)
+    team.delete()
 
-    return Response('Team succsesfully deleted!')
+    return Response('Team succsesfully deleted!',  status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def workArrangementList(request):
     tasks = workArrangement.objects.all()
     serializer = workArrSerializer(tasks, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data,  status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def workArrangementDetail(request, pk):
-    tasks = workArrangement.objects.get(waId = pk)
+    tasks = workArrangement.objects.get(waID = pk)
     serializer = workArrSerializer(tasks, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data,  status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def workArrangementCreate(request):
     serializer = workArrSerializer(data=request.data)
-
     if serializer.is_valid():
-        serializer.save()
+            serializer.save()
+            return Response(serializer.data,  status=status.HTTP_200_OK)
 
-    return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST'])
-def workArrangementUpdate(request):
-    serializer = workArrSerializer(data=request.data)
+def workArrangementUpdate(request, pk):
+    workArr = Role.objects.get(waID=pk)
+    serializer = workArrSerializer(instance=workArr, data=request.data)
 
     if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data,  status=status.HTTP_200_OK)
 
-    return Response(serializer.errors)
+    return Response(serializer.errors,  status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
 def workArrangementDelete(request, pk):
-    employee = workArrangement.objects.get(teamId=pk)
-    employee.delete()
+    workArr = workArrangement.objects.get(waID=pk)
+    workArr.delete()
 
-    return Response('Arrangement succsesfully deleted!')
+    return Response('Arrangement succsesfully deleted!',  status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def roleList(request):
     tasks = Role.objects.all()
     serializer = roleSerializer(tasks, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data,  status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def roleDetail(request, pk):
     tasks = Role.objects.get(waId = pk)
     serializer = roleSerializer(tasks, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data,  status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def roleCreate(request):
     serializer = roleSerializer(data=request.data)
 
     if serializer.is_valid():
-        serializer.save()
+            serializer.save()
+            return Response(serializer.data,  status=status.HTTP_200_OK)
 
-    return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST'])
-def roleUpdate(request):
-    serializer = roleSerializer(data=request.data)
+def roleUpdate(request,pk):
+    role = Role.objects.get(roleID=pk)
+    serializer = roleSerializer(instance=role, data=request.data)
 
     if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data,  status=status.HTTP_200_OK)
 
-    return Response(serializer.errors)
+    return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['DELETE'])
 def roleDelete(request, pk):
-    employee = Role.objects.get(teamId=pk)
-    employee.delete()
+    role = Role.objects.get(teamId=pk)
+    role.delete()
 
     return Response('Arrangement succsesfully deleted!')
 
