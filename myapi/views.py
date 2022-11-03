@@ -132,10 +132,12 @@ def employeeUpdate(request, pk):
 
 @api_view(['DELETE'])
 def employeeDelete(request, pk):
-    employee = Employee.objects.get(empId=pk)
-    employee.delete()
-
-    return Response('Employee succsesfully delete!')
+    try:
+        employee = Employee.objects.get(empId=pk)
+        employee.delete()
+        return Response('Employee succsesfully delete!')
+    except:
+        return Response("Employee does not exist", status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 def teamList(request):
@@ -163,7 +165,7 @@ def teamCreate(request):
     except:
         return Response("Employee "+leader+"does not exist", status=status.HTTP_404_NOT_FOUND)
 
-    serializer = teamSerializer(data=request.data)
+    serializer = addTeamSerializer(data=request.data)
 
     if serializer.is_valid():
         serializer.save()
@@ -184,7 +186,7 @@ def teamUpdate(request,pk):
     except:
         return Response("Employee "+leader+"does not exist", status=status.HTTP_400_BAD_REQUEST)
 
-    serializer = teamSerializer(instance=team, data=request.data)
+    serializer = addTeamSerializer(instance=team, data=request.data)
 
     if serializer.is_valid():
             serializer.save()
@@ -194,10 +196,13 @@ def teamUpdate(request,pk):
 
 @api_view(['DELETE'])
 def teamDelete(request, pk):
-    team = Team.objects.get(teamId=pk)
-    team.delete()
+    try:
+        team = Team.objects.get(teamId=pk)
+        team.delete()
 
-    return Response('Team succsesfully deleted!',  status=status.HTTP_200_OK)
+        return Response('Team succsesfully deleted!',  status=status.HTTP_200_OK)
+    except:
+        return Response("Team does not exist", status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET','POST'])
@@ -224,9 +229,12 @@ def get_Delete_Update_workArrangement(request, pk):
         return Response(serializer.data,  status=status.HTTP_200_OK)
     
     if request.method == 'DELETE':
-        workArr = workArrangement.objects.get(waID=pk)
-        workArr.delete()
-        return Response('Work arrangement succsesfully deleted!')
+        try:
+            workArr = workArrangement.objects.get(waID=pk)
+            workArr.delete()
+            return Response('Work arrangement succsesfully deleted!')
+        except:
+             Response("Arrangment does not exist", status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PUT":
         workArr = workArrangement.objects.get(waID=pk)
@@ -262,13 +270,56 @@ def get_Delete_Update_Role(request, pk):
         return Response(serializer.data,  status=status.HTTP_200_OK)
     
     if request.method == 'DELETE':
-        role = Role.objects.get(roleID=pk)
-        role.delete()
-        return Response('Role succsesfully deleted!')
+        try:
+            role = Role.objects.get(roleID=pk)
+            role.delete()
+            return Response('Role succsesfully deleted!')
+        except:
+             Response("Role does not exist", status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PUT":
         role = Role.objects.get(roleID=pk)
         serializer = roleSerializer(instance=role, data=request.data)
+
+        if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data,  status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET', 'POST'])
+def get_Post_Hours(request):
+    #Get all roles
+    if request.method == 'GET':                 
+        hours = payRoll.objects.all()
+        serializer = payRollSerializer(hours, many=True)
+        return Response(serializer.data,  status=status.HTTP_200_OK)
+    if request.method == 'POST':
+        serializer = payRollSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,  status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET','DELETE','PUT'])
+def get_Delete_Update_Hours(request, pk):
+    if request.method == 'GET':
+        hours = payRoll.objects.get(emp= pk)
+        serializer = payRollSerializer(hours)
+        return Response(serializer.data,  status=status.HTTP_200_OK)
+    
+    if request.method == 'DELETE':
+        try:
+            hours = payRoll.objects.get(emp=pk)
+            hours.delete()
+            return Response('Hours succsesfully deleted!')
+        except:
+            return Response("Payroll does not exist", status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "PUT":
+        hours = payRoll.objects.get(emp=pk)
+        serializer = hours(instance=role, data=request.data)
 
         if serializer.is_valid():
                 serializer.save()

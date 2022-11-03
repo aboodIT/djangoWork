@@ -16,16 +16,22 @@ class teamSerializer(serializers.ModelSerializer):
         model = Team
         fields = '__all__'
 
+class addTeamSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Team
+        fields = '__all__'
+
 class roleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'
 
-class payrollSerializer(serializers.Serializer):
+class payRollSerializer(serializers.Serializer):
     class Meta:
         model = payRoll
         field = "__all__"
-        
+
 class workArrSerializer(serializers.ModelSerializer):
     class Meta:
         model = workArrangement

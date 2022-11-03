@@ -9,6 +9,7 @@ class testSetup(APITestCase):
         # self.employeeDetailURL = reverse('employee-detail')
         self.employeeCreateURL = reverse('employee-create')
         self.teamCreateURL = reverse('team-create')
+
         
         self.employeeData = {
             "empId": 1,
