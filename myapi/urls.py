@@ -24,16 +24,12 @@ urlpatterns = [
 	path('team-delete/<str:pk>/', views.teamDelete, name="team-delete"),
 
     #Paths for roles
-    path('role-list/', views.roleList, name="role-list"),
-    path('role-detail/<str:pk>/', views.roleDetail, name="role-detail"),
-    path('role-create/', views.roleCreate, name="role-create"),
-    path('role-update/<str:pk>/', views.roleUpdate, name="role-update"),
-	path('role-delete/<str:pk>/', views.roleDelete, name="role-delete"),
+    path('role-list/', views.get_Post_role, name="role-list"),
+    path('role-detail/<str:pk>/', views.get_Delete_Update_Role, name="role-detail"),
+   
 
     #Paths for workArrangement 
-    path('workArrangement-list/', views.workArrangementList, name="workArrangement-list"),
-    path('workArrangement-detail/<str:pk>/', views.workArrangementDetail, name="workArrangement-detail"),
-    path('workArrangement-create/', views.workArrangementCreate, name="workArrangement-create"),
-    path('workArrangement-update/<str:pk>/', views.workArrangementUpdate, name="workArrangment-update"),
-	path('workArrangement-delete/<str:pk>/', views.workArrangementDelete, name="workArrangment-delete"),
+    path('workArrangement-list/', views.get_Post_workArrangement, name="workArrangement-list"),
+    path('workArrangement-detail/<str:pk>/', views.get_Delete_Update_workArrangement, name="workArrangement-detail"),
+   
 ]

@@ -1,4 +1,4 @@
-
+import pdb
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 # Create your views here.
@@ -6,11 +6,6 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .serializers import *
 from .models import *
-
-
-# class employeeViewSet(viewsets.ModelViewSet):
-#     queryset = Employee.objects.all().order_by('name')
-#     serializer_class = employeeSerializer
 
 @api_view(['GET'])
 def employeeList(request):
@@ -205,85 +200,85 @@ def teamDelete(request, pk):
     return Response('Team succsesfully deleted!',  status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-def workArrangementList(request):
-    tasks = workArrangement.objects.all()
-    serializer = workArrSerializer(tasks, many=True)
-    return Response(serializer.data,  status=status.HTTP_200_OK)
-
-@api_view(['GET'])
-def workArrangementDetail(request, pk):
-    tasks = workArrangement.objects.get(waID = pk)
-    serializer = workArrSerializer(tasks, many=True)
-    return Response(serializer.data,  status=status.HTTP_200_OK)
-
-@api_view(['POST'])
-def workArrangementCreate(request):
-    serializer = workArrSerializer(data=request.data)
-    if serializer.is_valid():
+@api_view(['GET','POST'])
+def get_Post_workArrangement(request):
+    if(request.method == 'GET'):
+        tasks = workArrangement.objects.all()
+        serializer = workArrSerializer(tasks, many=True)
+        return Response(serializer.data,  status=status.HTTP_200_OK)
+    
+    if(request.method == 'POST'):
+        serializer = workArrSerializer(data=request.data)
+        if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,  status=status.HTTP_200_OK)
 
-    return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['POST'])
-def workArrangementUpdate(request, pk):
-    workArr = Role.objects.get(waID=pk)
-    serializer = workArrSerializer(instance=workArr, data=request.data)
 
-    if serializer.is_valid():
+@api_view(['GET','DELETE','PUT'])
+def get_Delete_Update_workArrangement(request, pk):
+    if request.method == 'GET':
+        workArr = workArrangement.objects.get(waID = pk)
+        serializer = workArrSerializer(workArr)
+        return Response(serializer.data,  status=status.HTTP_200_OK)
+    
+    if request.method == 'DELETE':
+        workArr = workArrangement.objects.get(waID=pk)
+        workArr.delete()
+        return Response('Work arrangement succsesfully deleted!')
+
+    if request.method == "PUT":
+        workArr = workArrangement.objects.get(waID=pk)
+        serializer = workArrSerializer(instance=workArr, data=request.data)
+
+        if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data,  status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET', 'POST'])
+def get_Post_role(request):
+    #Get all roles
+    if request.method == 'GET':                 
+        tasks = Role.objects.all()
+        serializer = roleSerializer(tasks, many=True)
+        return Response(serializer.data,  status=status.HTTP_200_OK)
+    if request.method == 'POST':
+        serializer = roleSerializer(data=request.data)
+        if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,  status=status.HTTP_200_OK)
 
-    return Response(serializer.errors,  status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['DELETE'])
-def workArrangementDelete(request, pk):
-    workArr = workArrangement.objects.get(waID=pk)
-    workArr.delete()
-
-    return Response('Arrangement succsesfully deleted!',  status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['GET'])
-def roleList(request):
-    tasks = Role.objects.all()
-    serializer = roleSerializer(tasks, many=True)
-    return Response(serializer.data,  status=status.HTTP_200_OK)
+@api_view(['GET','DELETE','PUT'])
+def get_Delete_Update_Role(request, pk):
+    if request.method == 'GET':
+        role = Role.objects.get(roleID = pk)
+        serializer = roleSerializer(role)
+        return Response(serializer.data,  status=status.HTTP_200_OK)
+    
+    if request.method == 'DELETE':
+        role = Role.objects.get(roleID=pk)
+        role.delete()
+        return Response('Role succsesfully deleted!')
 
-@api_view(['GET'])
-def roleDetail(request, pk):
-    tasks = Role.objects.get(waId = pk)
-    serializer = roleSerializer(tasks, many=True)
-    return Response(serializer.data,  status=status.HTTP_200_OK)
+    if request.method == "PUT":
+        role = Role.objects.get(roleID=pk)
+        serializer = roleSerializer(instance=role, data=request.data)
 
-@api_view(['POST'])
-def roleCreate(request):
-    serializer = roleSerializer(data=request.data)
+        if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data,  status=status.HTTP_200_OK)
 
-    if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,  status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
-    return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['POST'])
-def roleUpdate(request,pk):
-    role = Role.objects.get(roleID=pk)
-    serializer = roleSerializer(instance=role, data=request.data)
 
-    if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,  status=status.HTTP_200_OK)
 
-    return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
-
-@api_view(['DELETE'])
-def roleDelete(request, pk):
-    role = Role.objects.get(teamId=pk)
-    role.delete()
-
-    return Response('Arrangement succsesfully deleted!')
 
 
 

@@ -25,16 +25,13 @@ class payrollSerializer(serializers.Serializer):
     class Meta:
         model = payRoll
         field = "__all__"
+        
 class workArrSerializer(serializers.ModelSerializer):
     class Meta:
         model = workArrangement
         fields = '__all__'
 
 class addEmployeeSerializer(serializers.ModelSerializer):
-
-    # currTeam = serializers.SlugRelatedField(read_only = True,slug_field='name')
-    # workArr = serializers.SlugRelatedField(read_only = True,slug_field='name')
-    # role = serializers.SlugRelatedField(read_only = True,slug_field='name')
   
     class Meta:
         model = Employee
