@@ -1,11 +1,11 @@
 import pdb
-from django.shortcuts import render
 from rest_framework.decorators import api_view
 # Create your views here.
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .serializers import *
 from .models import *
+from django.shortcuts import render, get_object_or_404
 
 @api_view(['GET'])
 def employeeList(request):
@@ -16,7 +16,7 @@ def employeeList(request):
 
 @api_view(['GET'])
 def employeeDetail(request, pk):
-    tasks = Employee.objects.get(empId=pk)
+    tasks = get_object_or_404(Employee, empId=pk)
     serializer = employeeSerializer(tasks, many=False)
     return Response(serializer.data,  status=status.HTTP_200_OK)
 
@@ -111,7 +111,7 @@ def employeeUpdate(request, pk):
             request.data['role'] = role.roleID
     except:
         if(role != None):
-            return Response("Role: " + role.name + "does not exist", status=status.HTTP_404_NOT_FOUND)
+            return Response("Role: " + role + "does not exist", status=status.HTTP_404_NOT_FOUND)
 
     try:
         if(workArr == ''): pass
@@ -133,7 +133,7 @@ def employeeUpdate(request, pk):
 @api_view(['DELETE'])
 def employeeDelete(request, pk):
     try:
-        employee = Employee.objects.get(empId=pk)
+        employee = get_object_or_404(Employee, empId=pk)
         employee.delete()
         return Response('Employee succsesfully delete!')
     except:
@@ -148,7 +148,7 @@ def teamList(request):
 
 @api_view(['GET'])
 def teamDetail(request,pk):
-    tasks = Team.objects.get(teamId = pk)
+    tasks = get_object_or_404(Team, teamId=pk)
     serializer = teamSerializer(tasks, many=True)
     return Response(serializer.data,  status=status.HTTP_200_OK)
 
@@ -197,7 +197,7 @@ def teamUpdate(request,pk):
 @api_view(['DELETE'])
 def teamDelete(request, pk):
     try:
-        team = Team.objects.get(teamId=pk)
+        team = get_object_or_404(Team, teamId=pk)
         team.delete()
 
         return Response('Team succsesfully deleted!',  status=status.HTTP_200_OK)
@@ -224,7 +224,7 @@ def get_Post_workArrangement(request):
 @api_view(['GET','DELETE','PUT'])
 def get_Delete_Update_workArrangement(request, pk):
     if request.method == 'GET':
-        workArr = workArrangement.objects.get(waID = pk)
+        workArr = get_object_or_404(workArrangement, waID=pk)
         serializer = workArrSerializer(workArr)
         return Response(serializer.data,  status=status.HTTP_200_OK)
     
@@ -237,7 +237,7 @@ def get_Delete_Update_workArrangement(request, pk):
              Response("Arrangment does not exist", status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PUT":
-        workArr = workArrangement.objects.get(waID=pk)
+        workArr = get_object_or_404(workArrangement, waID=pk)
         serializer = workArrSerializer(instance=workArr, data=request.data)
 
         if serializer.is_valid():
@@ -265,7 +265,7 @@ def get_Post_role(request):
 @api_view(['GET','DELETE','PUT'])
 def get_Delete_Update_Role(request, pk):
     if request.method == 'GET':
-        role = Role.objects.get(roleID = pk)
+        role = get_object_or_404(Role, roleID=pk)
         serializer = roleSerializer(role)
         return Response(serializer.data,  status=status.HTTP_200_OK)
     
@@ -278,7 +278,7 @@ def get_Delete_Update_Role(request, pk):
              Response("Role does not exist", status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "PUT":
-        role = Role.objects.get(roleID=pk)
+        role = get_object_or_404(Role, roleID=pk)
         serializer = roleSerializer(instance=role, data=request.data)
 
         if serializer.is_valid():
@@ -294,7 +294,9 @@ def get_Post_Hours(request):
         hours = payRoll.objects.all()
         serializer = payRollSerializer(hours, many=True)
         return Response(serializer.data,  status=status.HTTP_200_OK)
+
     if request.method == 'POST':
+        get_object_or_404(Employee,empId=request.data['emp'])
         serializer = payRollSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -305,7 +307,7 @@ def get_Post_Hours(request):
 @api_view(['GET','DELETE','PUT'])
 def get_Delete_Update_Hours(request, pk):
     if request.method == 'GET':
-        hours = payRoll.objects.get(emp= pk)
+        hours = get_object_or_404(payRoll,emp=pk)
         serializer = payRollSerializer(hours)
         return Response(serializer.data,  status=status.HTTP_200_OK)
     
@@ -319,7 +321,7 @@ def get_Delete_Update_Hours(request, pk):
 
     if request.method == "PUT":
         hours = payRoll.objects.get(emp=pk)
-        serializer = hours(instance=role, data=request.data)
+        serializer = payRollSerializer(instance=hours, data=request.data)
 
         if serializer.is_valid():
                 serializer.save()

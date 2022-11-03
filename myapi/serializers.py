@@ -27,10 +27,12 @@ class roleSerializer(serializers.ModelSerializer):
         model = Role
         fields = '__all__'
 
-class payRollSerializer(serializers.Serializer):
+class payRollSerializer(serializers.ModelSerializer):
+    emp = serializers.PrimaryKeyRelatedField(read_only=True)
+    hours = serializers.IntegerField()
     class Meta:
         model = payRoll
-        field = "__all__"
+        fields = "__all__"
 
 class workArrSerializer(serializers.ModelSerializer):
     class Meta:

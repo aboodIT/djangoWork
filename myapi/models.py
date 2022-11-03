@@ -30,7 +30,7 @@ class workArrangement(models.Model):
         return self.name
 
 class payRoll(models.Model):   #Model to record the hours the employee has worked
-    emp = models.ForeignKey('Employee', on_delete = models.CASCADE, blank = True, null = True)
+    emp = models.OneToOneField('Employee', on_delete = models.CASCADE, blank = True, null = True)
     hours = models.IntegerField()
 
     def __int__(self):
