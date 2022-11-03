@@ -70,7 +70,7 @@ Expects values for the following in the request body:
 
 `/employee-update/<pk>`
 
-POST - Edits a specific Employee object
+PUT - Edits a specific Employee object
 
 Expects values for the following in the request body:
 - empId
@@ -105,7 +105,7 @@ Expects values for the following in the request body:
 
 `/team-update/<pk>`
 
-POST - Edits a specific Team object
+PUT - Edits a specific Team object
 
 Expects values for the following in the request body:
 - teamId
@@ -129,7 +129,7 @@ POST - Creates and stores a new Role object
 `/role-detail/<pk>`
 
 GET - Returns information about the Role with the specified `pk`
-POST - Edits a specific Role object
+PUT - Edits a specific Role object
 	Expects values for the following in the request body:
 	- roleID
 	- name
@@ -148,9 +148,27 @@ POST - Creates and stores a new work arrangement object
 `/workArrangement-detail/<pk>`
 
 GET - Returns information about the work arrangement with the specified `pk`
-POST - Edits a specific work arrangement object
+PUT - Edits a specific work arrangement object
 	Expects values for the following in the request body:
 	- waID
 	- name
 DELETE - Deletes the work arrangement object with the specified `pk`
 
+
+### Pay roll
+
+`/payroll-list`
+GET - returns all pay roll objects
+POST - Creates and stores a new pay roll object
+	Expects values for the following in the request body:
+	- emp (empId of the employee)
+	- hours
+
+`/payroll-detail/<pk>`
+
+GET - Returns information about the payroll with the specified employee Id as `pk`
+PUT - Edits a specific pay roll object
+	Expects values for the following in the request body:
+	- emp (empId of the employee)
+	- hours
+DELETE - Deletes the payroll object with the specified `pk`
